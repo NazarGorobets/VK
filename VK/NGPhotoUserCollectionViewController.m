@@ -79,17 +79,15 @@ static NSString * const reuseIdentifier = @"Cell";
                                               
                                               if ([photos count] > 0) {
                                                   
-                                                  typeof(self) strongSelf = weakSelf;
-                                                  
                                                   NSMutableArray* arrPath = [NSMutableArray array];
                                                   
-                                                  for (NSInteger i= [strongSelf.miniaturePhotoArray count]; i<=[photos count]+[strongSelf.miniaturePhotoArray count]-1; i++) {
+                                                  for (NSInteger i= [weakSelf.miniaturePhotoArray count]; i<=[photos count]+[weakSelf.miniaturePhotoArray count]-1; i++) {
                                                       
                                                       [arrPath addObject:[NSIndexPath indexPathForRow:i inSection:0]];
                                                   }
                                                   
-                                                  [strongSelf.miniaturePhotoArray addObjectsFromArray:photos];
-                                                  [strongSelf.collectionViewPhoto insertItemsAtIndexPaths:arrPath];
+                                                  [weakSelf.miniaturePhotoArray addObjectsFromArray:photos];
+                                                  [weakSelf.collectionViewPhoto insertItemsAtIndexPaths:arrPath];
                                                   
                                                   
                                                     self.loadingDataCollPhoto = NO;

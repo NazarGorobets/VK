@@ -11,7 +11,6 @@
 #import "NGLinkObjectData.h"
 #import "NGMusicWallObjectData.h"
 
-//
 #import "AFNetWorking.h"
 #import "UIImageView+AFNetworking.h"
 
@@ -73,17 +72,17 @@ static CGSize CGSizeResizeToHeight(CGSize size, CGFloat height) {
                 
                 __weak UIImageView *weakImageView = imageView;
                 
-                [imageView setImageWithURLRequest:request
-                                 placeholderImage:nil
-                                          success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
-                                              
-                                              weakImageView.image = image;
-                                              [self displayImage:weakImageView withImage:image withImageURL:imageObj.photo_1280URL index:i];
-                                              
-                                          }
-                                          failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
-                                              
-                                          }];
+//                [imageView setImageWithURLRequest:request
+//                                 placeholderImage:nil
+//                                          success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+//                                              
+//                                              weakImageView.image = image;
+//                                              [self displayImage:weakImageView withImage:image withImageURL:imageObj.photo_1280URL index:i];
+//                                              
+//                                          }
+//                                          failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+//                                              
+//                                          }];
                 i++;
                 [self.framesArray addObject:imageObj];
                 [self.imageViews addObject:imageView];

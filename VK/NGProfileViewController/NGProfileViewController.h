@@ -10,7 +10,4 @@
 
 @interface NGProfileViewController : UITableViewController
 @property (strong, nonatomic) NSString* superUserID;
-//@property (strong, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UICollectionView *collectionViewPhotoCarusel;
-
 @end

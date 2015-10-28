@@ -33,7 +33,9 @@
 
 @property (strong, nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UISegmentedControl *segmentedControl;
+@property (nonatomic, strong) NSMutableArray *searchResult;
 @property (strong, nonatomic) NSMutableArray* arrayFriends;
+@property (strong, nonatomic) NSString *sortBy;
 @property (strong, nonatomic) NSString *userID;
 @property (assign, nonatomic) BOOL loadingData;
 
@@ -49,6 +51,8 @@
      self.arrayFriends = [NSMutableArray array];
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
      self.userID = [userDefaults objectForKey:@"userID"];
+     self.sortBy = @"_lastName";
+     self.searchResult = [NSMutableArray arrayWithCapacity:[self.arrayFriends count]];
     
     SWRevealViewController *revealViewController = self.revealViewController;
     if ( revealViewController )
@@ -70,67 +74,59 @@
 #pragma mark - Custom Toolbar
 
 -(void) setCustomToolbar {
+    
+    UIView *viewPtr = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 44, 10)];
+    UISegmentedControl *mainSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"All Friends", @"Online", nil]];
+    CGRect myFrame = CGRectMake(- 60.f, - 10.0f, self.view.frame.size.width - 40 , 30.0f);
+     mainSegment.frame = myFrame;
+    [mainSegment setTintColor:[UIColor grayColor]];
+    //self.navigationItem.titleView = mainSegment;
+     mainSegment.selectedSegmentIndex = 0;
+    [mainSegment addTarget:self action:@selector(mainSegmentControl:) forControlEvents: UIControlEventValueChanged];
+    [viewPtr addSubview:mainSegment];
+    
+    UIBarButtonItem *control = [[UIBarButtonItem alloc] initWithCustomView:mainSegment];
+    NSArray *items = [NSArray arrayWithObjects:control, nil];
+    self.toolbarItems = items;
    
 }
 
-- (void) whichColor:(UISegmentedControl *)paramSender{
+- (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
+{
+    [self.searchResult removeAllObjects];
+    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"SELF contains[c] %@", searchText];
     
-    //check if its the same control that triggered the change event
-    if ([paramSender isEqual:self.segmentedControl]){
-        
-        //get index position for the selected control
-        NSInteger selectedIndex = [paramSender selectedSegmentIndex];
-        
-        //get the Text for the segmented control that was selected
-        NSString *myChoice =
-        [paramSender titleForSegmentAtIndex:selectedIndex];
-        //let log this info to the console
-        NSLog(@"Segment at position %li with %@ text is selected",
-              (long)selectedIndex, myChoice);
-    }
+    self.searchResult = [NSMutableArray arrayWithArray: [self.arrayFriends filteredArrayUsingPredicate:resultPredicate]];
 }
 
+- (void)willPresentSearchController:(UISearchController *)searchController {
+    
+    self.navigationController.navigationBar.translucent = YES;
+}
 
+-(void)willDismissSearchController:(UISearchController *)searchController
+{
+    self.navigationController.navigationBar.translucent = NO;
+}
 
 - (void)viewWillAppear:(BOOL)animated
 {
-//    [self.navigationController setToolbarHidden:NO animated:NO];
+    [self.navigationController setToolbarHidden:NO animated:NO];
+}
+
+- (void)mainSegmentControl:(UISegmentedControl *)segment
+{
     
-    /*
-     
-     
-     Custom Toolbar ! Not Work :(
-     
-     */
-    
-    
-    
-    
-//    //create an intialize our segmented control
-//    
-//    NSArray *mySegments = [[NSArray alloc] initWithObjects: @"All Friends",
-//                           @"Online", nil];
-//    [self.segmentedControl addTarget:self
-//                              action:@selector(whichColor:)
-//                    forControlEvents:UIControlEventTouchDown ];
-//    self.segmentedControl = [[UISegmentedControl alloc] initWithItems:mySegments];
-//    UIView *viewPtr = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 44, 10)];
-//    
-//    [self.segmentedControl setTintColor:[UIColor grayColor]];
-//    self.view.backgroundColor = [UIColor whiteColor];
-//    
-//    CGRect myFrame = CGRectMake(10.0f, - 10.0f, 300.0f, 30.0f);
-//    self.segmentedControl.frame = myFrame;
-//    
-//    [self.segmentedControl setSelectedSegmentIndex:0];
-//    
-//    [viewPtr addSubview:self.segmentedControl];
-//    
-//    UIBarButtonItem *control = [[UIBarButtonItem alloc] initWithCustomView:viewPtr];
-//    NSArray *items = [NSArray arrayWithObjects:control, nil];
-//    self.toolbarItems = items;
-//    
-    
+    if(segment.selectedSegmentIndex == 0)
+    {
+         self.sortBy = @"_lastName";
+        [self reloadTableViewContent];
+    }
+    else if(segment.selectedSegmentIndex == 1)
+    {
+         self.sortBy = @"_isOnline";
+        [self reloadTableViewContent];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -140,7 +136,6 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController
@@ -161,22 +156,20 @@
     
     [[NGServerManager sharedManager] getFriendsWithOffset:self.userID
                                                withOffset:[self.arrayFriends count]
-                                                withCount:50
+                                                withCount:100
                                                 onSuccess:^(NSArray *friends) {
                                                     
                                                     
                                                     
                                                     if ([friends count] > 0) {
-                        
-                                                        typeof(self) strongSelf = weakSelf;
                                                         
                                                         NSLog(@"Loading");
                                                         
-                                                        [strongSelf.arrayFriends addObjectsFromArray:friends];
+                                                        [weakSelf.arrayFriends addObjectsFromArray:friends];
                                                         
                                                         NSMutableArray* newPaths = [NSMutableArray array];
                                                         
-                                                        for (int i = (int)[strongSelf.arrayFriends count] - (int)[friends count]; i < [strongSelf.arrayFriends count]; i++){
+                                                        for (int i = (int)[weakSelf.arrayFriends count] - (int)[friends count]; i < [weakSelf.arrayFriends count]; i++){
                                                             [newPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
                                                             
                                                         }
@@ -278,28 +271,50 @@
 
     //return self.arrayFriends.count;
 
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    
+    if ([self.sortBy isEqualToString:@"_isOnline"]) {
+        return 0;
+    }
+    return 25.0f;
+}
+
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
+    if ([self.sortBy isEqualToString:@"_isOnline"]) {
+        
+        return 1;
+    }
     return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+
+    if (![self.sortBy isEqualToString:@"_isOnline"]) {
+
+            if (self.loadingData == NO) {
     
-    if (self.loadingData == NO) {
-    
-    if (section == 0) {
-        return 5;
-    }
-        if (section == 1) {
-            return self.arrayFriends.count;
+                if (section == 0) {
+                    return 5;
+                }
+                if (section == 1) {
+                    return self.arrayFriends.count - 5;
             
-        }
+                }
         
-    }
+            }}
     
     return self.arrayFriends.count;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    
+    if (section == 0) {
+        return @"Important";
+    }
+    return @"";
 }
 
 
@@ -309,13 +324,21 @@
     
     if (self.loadingData == NO) {
         
+        if (indexPath.section == 0) {
+            
+            NSMutableArray *friends = self.arrayFriends;
+            if ([self.sortBy isEqualToString:@"_isOnline"]){
+            NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:self.sortBy ascending:YES];
+                [friends sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+            }
+        
     NGMyFriendsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
     if(!cell){
         cell = [[NGMyFriendsTableViewCell alloc] initWithStyle:
                 UITableViewCellStyleSubtitle      reuseIdentifier:identifier];
     }
 
-    NGGetFriendsObjectData* friend = self.arrayFriends[indexPath.row];
+    NGGetFriendsObjectData* friend = friends[indexPath.row];
     
     cell.nameFriend.text       = [NSString stringWithFormat:@"%@ %@",friend.firstName, friend.lastName];
 
@@ -330,6 +353,43 @@
         }
     
     return cell;
+        
+        }
+        
+        if (indexPath.section == 1) {
+            
+            NSMutableArray *friends = self.arrayFriends;
+            
+            NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:self.sortBy ascending:YES];
+            [friends sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+            
+            NGMyFriendsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
+            if(!cell){
+                cell = [[NGMyFriendsTableViewCell alloc] initWithStyle:
+                        UITableViewCellStyleSubtitle      reuseIdentifier:identifier];
+            }
+            
+            NGGetFriendsObjectData* friend = friends[indexPath.row];
+            
+            cell.nameFriend.text       = [NSString stringWithFormat:@"%@ %@",friend.firstName, friend.lastName];
+            
+            [cell.avatarFriends setImageWithURL:friend.imageURL placeholderImage:[UIImage imageNamed:@"pl_man"]];
+            
+            
+            if ([friend.isOnline isEqualToString:@"Online"]) {
+                cell.imageIsOnline.hidden = NO;
+            } else  if ([friend.isOnline isEqualToString:@"offline"]){
+                cell.imageIsOnline.hidden = YES;
+                
+            }
+            
+            return cell;
+            
+            
+        }
+        
+        
+        
     }
     
     NGMyFriendsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];

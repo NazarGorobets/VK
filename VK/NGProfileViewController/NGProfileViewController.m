@@ -77,7 +77,6 @@ static NSInteger ownerPostWallFilter = 1;
 @property (strong, nonatomic) NSString* wallFilter;
 @property (strong, nonatomic) NSURL *photo_100URL;
 @property (strong,nonatomic)  NSMutableArray *imageViewSize;
-@property (strong, nonatomic) NGGetUserObjectData *currentUser;
 @property (strong, nonatomic) NSMutableArray *postArray;
 @property (strong, nonatomic) NSMutableArray *productArray;
 @property (strong, nonatomic) NSArray* arrayNumberDataCountres;
@@ -86,6 +85,8 @@ static NSInteger ownerPostWallFilter = 1;
 @property (strong, nonatomic) NSMutableArray* pathsArray;
 @property (strong, nonatomic) NSMutableArray* arrrayWall;
 @property (strong, nonatomic) UICollectionView* collectionViewPhoto;
+@property (strong,nonatomic)  NGGetCommunitiesObjectData *currentGroup;
+@property (strong, nonatomic) NGGetUserObjectData *currentUser;
 
 @property (assign, nonatomic)  BOOL loadingDataOfUser;
 @property (assign, nonatomic)  BOOL loadingDataCollPhoto;
@@ -98,7 +99,7 @@ static NSInteger ownerPostWallFilter = 1;
 
 static NSString * const shortInfoCellIdentifier = @"cellOne";
 static NSString * const reuseIdentifier = @"NGUserSubscriberCountTableViewCell";
-static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
+static NSString * const  wallIdentifier = @"cellWall";
 
 - (void)viewDidLoad {
     
@@ -114,6 +115,10 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
     self.arrrayWall = [NSMutableArray array];
     self.imageViewSize  = [NSMutableArray array];
     self.wallFilter = @"all";
+    
+    
+    self.currentUser  = [NGGetUserObjectData new];
+    self.currentGroup = [NGGetCommunitiesObjectData new];
     
     self.allPostsButton.layer.cornerRadius  = 5;
     self.allPostsButton.layer.masksToBounds = YES;
@@ -139,7 +144,7 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    
+    [super viewWillAppear:animated];
     [self.navigationController setToolbarHidden:YES animated:NO];
     
 }
@@ -202,14 +207,11 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
     
     [[NGServerManager sharedManager] getUsersInfoUserID:self.userID
                                               onSuccess:^(NGGetUserObjectData *user) {
-                                            
-                                                      
-                                                      typeof(self) strongSelf = weakSelf;
 
                                                   
-                                                   strongSelf.currentUser = user;
+                                                   weakSelf.currentUser = user;
                                                   
-                                                   strongSelf.navigationItem.title = user.firstName;
+                                                   weakSelf.navigationItem.title = user.firstName;
                                                 
                                                   [self setCounteresForCollectionView];
                                                    self.loadingDataOfUser = NO;
@@ -222,6 +224,8 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
                                               }];
 }
 
+// reloadRowsAtIndexPaths
+
 #pragma mark - Get Photo For User
 
 -(void)  getUserPhotoFromServer {
@@ -230,27 +234,22 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
     
     self.loadingDataCollPhoto = YES;
     
-    [[NGServerManager sharedManager] getPhotoUserID:self.userID
+    [[NGServerManager sharedManager] getPhotoUserID: self.userID
                                          withOffset:[self.miniaturePhotoArray count]
-                                              count:20
+                                              count: 20
                                           onSuccess:^(NSArray *photos) {
                                               
                                             if ([photos count] > 0){
-                                              
-                                                  
-                                            typeof(self) strongSelf = weakSelf;
-                                                  
-                                             
-                                                  
+
                                                   NSMutableArray* arrPath = [NSMutableArray array];
                                                   
-                                                  for (NSInteger i= [strongSelf.miniaturePhotoArray count]; i <= [photos count] + [strongSelf.miniaturePhotoArray count]-1; i++) {
+                                                  for (NSInteger i= [weakSelf.miniaturePhotoArray count]; i <= [photos count] + [weakSelf.miniaturePhotoArray count]-1; i++) {
                                                       
                                                       [arrPath addObject:[NSIndexPath indexPathForRow:i inSection:0]];
                                                   }
                                                   
-                                                  [strongSelf.miniaturePhotoArray addObjectsFromArray:photos];
-                                                  [strongSelf.collectionViewPhoto insertItemsAtIndexPaths:arrPath];
+                                                  [weakSelf.miniaturePhotoArray addObjectsFromArray:photos];
+                                                  [weakSelf.collectionViewPhoto insertItemsAtIndexPaths:arrPath];
                                                   
                                                   
                                                   self.loadingDataCollPhoto = NO;
@@ -283,27 +282,25 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
                                        
                                        if ([posts count] > 0) {
                                                
-                                               typeof(self) strongSelf = weakSelf;
-                                               
                                                NSMutableArray* arrPath = [NSMutableArray array];
                                                
-                                               for (NSInteger i = [strongSelf.arrrayWall count]; i<=[posts count]+[strongSelf.arrrayWall count]-1; i++) {
+                                               for (NSInteger i = [weakSelf.arrrayWall count]; i<=[posts count]+[weakSelf.arrrayWall count]-1; i++) {
                                                    
                                                    [arrPath addObject:[NSIndexPath indexPathForRow:i inSection:2]];
                                                }
                                                
                                                
-                                               [strongSelf.arrrayWall addObjectsFromArray:posts];
+                                               [weakSelf.arrrayWall addObjectsFromArray:posts];
                                                
                                                
                                                
-                                               for (int i = (int)[strongSelf.arrrayWall count] - (int)[posts count]; i < [strongSelf.arrrayWall count]; i++) {
+                                               for (int i = (int)[weakSelf.arrrayWall count] - (int)[posts count]; i < [weakSelf.arrrayWall count]; i++) {
 
-                                                   CGSize newSize = [strongSelf setFramesToImageViews:nil imageFrames:[[strongSelf.arrrayWall objectAtIndex:i] attachments]
+                                                   CGSize newSize = [weakSelf setFramesToImageViews:nil imageFrames:[[weakSelf.arrrayWall objectAtIndex:i] attachments]
                                                                                       toFitSize:CGSizeMake(self.view.frame.size.width-16, self.view.frame.size.width-16)];
                                                    
                                                    NSLog(@" getWallFromServer newSize = %@",NSStringFromCGSize(newSize));
-                                                   [strongSelf.imageViewSize addObject:[NSNumber numberWithFloat:roundf(newSize.height)]];
+                                                   [weakSelf.imageViewSize addObject:[NSNumber numberWithFloat:roundf(newSize.height)]];
                                                    
                                                }
 
@@ -327,6 +324,7 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
     if (self.loadingDataWall == NO && self.loadingDataOfUser == NO && self.loadingDataCollPhoto == NO) {
         
         dispatch_async(dispatch_get_main_queue(), ^ {
+            
             [self.tableView reloadData];
             
         });
@@ -558,7 +556,7 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     
-    return 1;
+    return 3;
     
 }
 
@@ -858,8 +856,8 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
     }
     
     if (section == 1) {
-        return 0;
-//        return  [self.arrrayWall count];
+        //return 1;
+       return  [self.arrrayWall count];
     }
     
     return 2;
@@ -874,12 +872,8 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
             
             if (indexPath.row == 0) {
                 
-                NGShortInfoTableViewCell *cell = (NGShortInfoTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"cell"];
+                NGShortInfoTableViewCell *cell = (NGShortInfoTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"userInfoCell" forIndexPath:indexPath];
                 
-//                if (!cell) {
-//                    cell = [[NGShortInfoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:shortInfoCellIdentifier];
-//                }
-
                 [cell.avatarUser setImageWithURL:self.currentUser.photo_100URL placeholderImage:[UIImage imageNamed:@"pl_man"]];
                 
                 cell.nameUser.text = [NSString stringWithFormat:@"%@ %@",self.currentUser.firstName , self.currentUser.lastName];
@@ -927,7 +921,7 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
                     cell = [[NGPhotoProfileTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"NGPhotoProfileTableViewCell"];
                 }
                 
-                [self.collectionViewPhotoCarusel reloadData];
+                [self.collectionViewPhoto reloadData];
                 return cell;
             }
 
@@ -938,6 +932,11 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
         
         NGWallCellTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:wallIdentifier];
         
+        if (!cell) {
+            cell = [[NGWallCellTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wallIdentifier];
+            
+        }
+        
         if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
         if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
         if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
@@ -945,7 +944,6 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
         [cell layoutIfNeeded];
         
         NGGetWallObjectData* wall = self.arrrayWall[indexPath.row];
-        
         
         if (wall.user) {
             cell.fullName.text = [NSString stringWithFormat:@"%@ %@",wall.user.firstName, wall.user.lastName];
@@ -957,9 +955,9 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
         cell.date.text     = wall.date;
         
         
-        cell.commentLabel.text = ([wall.comments length]>3) ? ([NSString stringWithFormat:@"%@k",[wall.comments substringToIndex:1]]) : (wall.comments);
-        cell.likeLabel.text    = ([wall.likes length]>3)    ? ([NSString stringWithFormat:@"%@k",[wall.likes substringToIndex:1]])    : (wall.likes);
-        cell.repostLabel.text  = ([wall.reposts length]>3)  ? ([NSString stringWithFormat:@"%@k",[wall.reposts substringToIndex:1]])  : (wall.reposts);
+        cell.commentLabel.text = ([wall.comments length] > 3) ? ([NSString stringWithFormat:@"%@k",[wall.comments substringToIndex:1]]) : (wall.comments);
+        cell.likeLabel.text    = ([wall.likes length] > 3)    ? ([NSString stringWithFormat:@"%@k",[wall.likes substringToIndex:1]])    : (wall.likes);
+        cell.repostLabel.text  = ([wall.reposts length] > 3)  ? ([NSString stringWithFormat:@"%@k",[wall.reposts substringToIndex:1]])  : (wall.reposts);
         
         
         
@@ -995,31 +993,31 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
             url = wall.user.photo_100URL;
         }
         
-        NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
-        
-        [cell.ownerPhoto setImageWithURLRequest:request
-                               placeholderImage:nil
-                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
-                                            
-                                            weakCell.ownerPhoto.image = image;
-                                            
-                                        }
-                                        failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
-                                            
-                                        }];
-        
-        
-        
+//        NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
+//        
+//        [cell.ownerPhoto setImageWithURLRequest:request
+//                               placeholderImage:nil
+//                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+//                                            
+//                                            weakCell.ownerPhoto.image = image;
+//                                            
+//                                        }
+//                                        failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+//                                            
+//                                        }];
+//        
+//        
+//        
         
         if ([wall.attachments count] > 0) {
             
-            if ([cell viewWithTag:11]) [[cell viewWithTag:11] removeFromSuperview];
+            if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
             if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
             if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
             
             CGPoint point = CGPointZero;
             
-            float sizeText = [self heightLabelOfTextForString:cell.textPost.text fontSize:14.f widthLabel:CGRectGetWidth(self.view.bounds)-2*8];
+            float sizeText = [self heightLabelOfTextForString:cell.textPost.text fontSize:14.f widthLabel:CGRectGetWidth(self.view.bounds) - 2 * 8];
             
             point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame),sizeText+(offsetBeforePhoto + heightPhoto + offsetBetweenPhotoAndText));
             
@@ -1112,6 +1110,72 @@ static NSString * const  wallIdentifier = @"NGWallCellTableViewCell";
 
     return cell;
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    //id cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+    if (indexPath.section == 0){
+    if (indexPath.row == 0) {
+        return 120.f;
+    }
+    if (indexPath.row == 1) {
+        return 60.f;
+    }
+    if (indexPath.row == 2) {
+        return 25.f;
+    }
+    if (indexPath.row == 3) {
+        return 75.f;
+    }
+    if (indexPath.row == 4) {
+        return 40.f;
+    }}
+    if (indexPath.section == 1) {
+        if (indexPath.row == 0) {
+            return 30;
+        }
+    }
+
+    
+//    if ([cell isKindOfClass:[ASGrayCell class]]) {
+//        return 16.f;
+//    }
+//    
+//    if ([cell isKindOfClass:[ASSegmentPost class]]) {
+//        return 44.f;
+//    }
+//    
+//    if ([cell isKindOfClass:[ASWallAttachmentCell class]]) {
+//        
+//        
+//        
+//        ASWall* wall = self.arrrayWall[indexPath.row];
+//        
+//        
+//        float height = 0;
+//        
+//        if (![wall.text isEqualToString:@""]) {
+//            height = height + (int)[self heightLabelOfTextForString:wall.text fontSize:14.f widthLabel:self.view.frame.size.width-(offset*2)];
+//        }
+//        
+//        
+//        if ([wall.attachments count] > 0) {
+//            height = height + [[self.imageViewSize objectAtIndex:indexPath.row]floatValue];
+//        }
+//        
+//        NSLog(@"IndexPath.row = %ld section =%ld  size height = %f",(long)indexPath.row,(long)indexPath.section,(offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared));
+//        
+//        
+//        return (offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared);
+//        
+//    }
+    
+    
+    return 400.f;
+}
+
+
 
 - (CGRect)heightTextView:(UITextView *)view {
     

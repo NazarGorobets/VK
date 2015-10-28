@@ -63,15 +63,13 @@
                                                     
                                                     if ([friends count] > 0) {
                                                         
-                                                        typeof(self) strongSelf = weakSelf;
+                                                        NSLog(@"Loading");
                                                         
-                                                        NSLog(@"подгружаю");
-                                                        
-                                                        [strongSelf.arrayCommunities addObjectsFromArray:friends];
+                                                        [weakSelf.arrayCommunities addObjectsFromArray:friends];
                                                         
                                                         NSMutableArray* newPaths = [NSMutableArray array];
                                                         
-                                                        for (int i = (int)[strongSelf.arrayCommunities count] - (int)[friends count]; i < [strongSelf.arrayCommunities count]; i++){
+                                                        for (int i = (int)[weakSelf.arrayCommunities count] - (int)[friends count]; i < [weakSelf.arrayCommunities count]; i++){
                                                             [newPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
                                                             
                                                         }
