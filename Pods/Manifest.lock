@@ -1,0 +1,84 @@
+PODS:
+  - AFNetworking (2.5.4):
+    - AFNetworking/NSURLConnection (= 2.5.4)
+    - AFNetworking/NSURLSession (= 2.5.4)
+    - AFNetworking/Reachability (= 2.5.4)
+    - AFNetworking/Security (= 2.5.4)
+    - AFNetworking/Serialization (= 2.5.4)
+    - AFNetworking/UIKit (= 2.5.4)
+  - AFNetworking/NSURLConnection (2.5.4):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.5.4):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.5.4)
+  - AFNetworking/Security (2.5.4)
+  - AFNetworking/Serialization (2.5.4)
+  - AFNetworking/UIKit (2.5.4):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - MRProgress/ActivityIndicator (0.8.2):
+    - MRProgress/Stopable
+  - MRProgress/AFNetworking (0.8.2):
+    - MRProgress/AFNetworking/ActivityIndicator (= 0.8.2)
+    - MRProgress/AFNetworking/Base (= 0.8.2)
+    - MRProgress/AFNetworking/Circular (= 0.8.2)
+    - MRProgress/AFNetworking/NavigationBarProgress (= 0.8.2)
+    - MRProgress/AFNetworking/Overlay (= 0.8.2)
+    - MRProgress/AFNetworking/ProgressBaseClass (= 0.8.2)
+  - MRProgress/AFNetworking/ActivityIndicator (0.8.2):
+    - MRProgress/ActivityIndicator
+    - MRProgress/AFNetworking/Base
+  - MRProgress/AFNetworking/Base (0.8.2):
+    - AFNetworking (~> 2.5.2)
+    - AFNetworking/UIKit
+    - MRProgress/MethodCopier
+  - MRProgress/AFNetworking/Circular (0.8.2):
+    - MRProgress/AFNetworking/ProgressBaseClass
+  - MRProgress/AFNetworking/NavigationBarProgress (0.8.2):
+    - MRProgress/AFNetworking/ProgressBaseClass
+  - MRProgress/AFNetworking/Overlay (0.8.2):
+    - MRProgress/AFNetworking/ActivityIndicator
+    - MRProgress/AFNetworking/Base
+    - MRProgress/AFNetworking/Circular
+    - MRProgress/Overlay
+  - MRProgress/AFNetworking/ProgressBaseClass (0.8.2):
+    - MRProgress/AFNetworking/Base
+    - MRProgress/ProgressBaseClass
+  - MRProgress/Blur (0.8.2):
+    - MRProgress/Helper
+  - MRProgress/Circular (0.8.2):
+    - MRProgress/Helper
+    - MRProgress/ProgressBaseClass
+    - MRProgress/Stopable
+  - MRProgress/Helper (0.8.2)
+  - MRProgress/Icons (0.8.2)
+  - MRProgress/MethodCopier (0.8.2)
+  - MRProgress/Overlay (0.8.2):
+    - MRProgress/ActivityIndicator
+    - MRProgress/Blur
+    - MRProgress/Circular
+    - MRProgress/Helper
+    - MRProgress/Icons
+  - MRProgress/ProgressBaseClass (0.8.2)
+  - MRProgress/Stopable (0.8.2):
+    - MRProgress/Helper
+  - SCLAlertView-Objective-C (0.7.7)
+  - VK-ios-sdk (1.2.2)
+
+DEPENDENCIES:
+  - AFNetworking
+  - MRProgress/AFNetworking
+  - SCLAlertView-Objective-C
+  - VK-ios-sdk
+
+SPEC CHECKSUMS:
+  AFNetworking: 05edc0ac4c4c8cf57bcf4b84be5b0744b6d8e71e
+  MRProgress: f4cfe862082418e8f542f077772283f425d6c699
+  SCLAlertView-Objective-C: 062808b4664add2d38d44b7867267985a02267ad
+  VK-ios-sdk: f4b7df0d4e277e06d60fef6dc472be4260eeda6d
+
+COCOAPODS: 0.39.0
