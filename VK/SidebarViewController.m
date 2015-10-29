@@ -34,8 +34,6 @@
     [super viewDidLoad];
 
     menuItems = @[@"Friends",@"Communities", @"Photos", @"User"];
-    self.imageUser.layer.cornerRadius = CGRectGetHeight(imageUser.bounds)/2;
-    self.imageUser.layer.masksToBounds = YES;
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     
 }
@@ -53,13 +51,13 @@
 
 -(void) setInformationOfMenu {
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSURL *image = [userDefaults objectForKey:@"image"];
-    self.nameUser.text = [userDefaults objectForKey:@"firstName"];
-
-        [self.imageUser setImageWithURL:image placeholderImage:[UIImage imageNamed:@"user202"]];
-        
- 
+//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+////    NSURL *image = [userDefaults objectForKey:@"image"];
+//    self.nameUser.text = [userDefaults objectForKey:@"firstName"];
+//
+//        [self.imageUser setImageWithURL:self.imageUs placeholderImage:[UIImage imageNamed:@"user202"]];
+//        
+// 
 }
 
 - (void)didReceiveMemoryWarning

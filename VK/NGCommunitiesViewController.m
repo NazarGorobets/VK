@@ -47,6 +47,10 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController setToolbarHidden:NO animated:NO];
+}
 
 -(void) getCommunitiesFromServer{
     
@@ -124,7 +128,6 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
     return 1;
 }
 

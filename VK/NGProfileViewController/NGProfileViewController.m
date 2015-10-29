@@ -11,6 +11,7 @@
 #import "SCLAlertView.h"
 #import "VKSdk.h"
 #import "SWRevealViewController.h"
+#import "SidebarViewController.h"
 #import "NGServerManager.h"
 #import "NGImageViewGallery.h"
 #import "UIImageView+AFNetworking.h"
@@ -31,6 +32,8 @@
 #import "NGUserSubscriberCountTableViewCell.h"
 #import "NGPhotoProfileCollectionViewCell.h"
 #import "NGPhotoProfileTableViewCell.h"
+#import "NGCountPhotoTableViewCell.h"
+
 
 static CGSize CGResizeFixHeight(CGSize size) {
     
@@ -51,19 +54,19 @@ static CGSize CGSizeResizeToHeight(CGSize size, CGFloat height) {
     return size;
 }
 
-static float offset       = 8.f;
-
-static float heightPhoto  = 60.f;
-static float heightShared = 33.f;
-
-static float offsetBeforePhoto                = 8.f;
-static float offsetBetweenPhotoAndText        = 8.f;
-static float offsetBetweenTextAndShared       = 16.f;
-static float offsetAfterShared                = 10.f;
-
-
-static NSInteger allPostWallFilter   = 0;
-static NSInteger ownerPostWallFilter = 1;
+//static float offset       = 8.f;
+//
+//static float heightPhoto  = 60.f;
+//static float heightShared = 33.f;
+//
+//static float offsetBeforePhoto                = 8.f;
+//static float offsetBetweenPhotoAndText        = 8.f;
+//static float offsetBetweenTextAndShared       = 16.f;
+//static float offsetAfterShared                = 10.f;
+//
+//
+//static NSInteger allPostWallFilter   = 0;
+//static NSInteger ownerPostWallFilter = 1;
 
 @interface NGProfileViewController ()<VKSdkDelegate, UITableViewDataSource, UITableViewDelegate,UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, UIScrollViewDelegate>
 
@@ -134,7 +137,7 @@ static NSString * const  wallIdentifier = @"cellWall";
     if ( revealViewController )
     {
         [self.sidebarButton setTarget: self.revealViewController];
-         self.sidebarButton.action = @selector(revealToggle:);
+        self.sidebarButton.action = @selector(revealToggle:);
         
     }
     
@@ -142,6 +145,8 @@ static NSString * const  wallIdentifier = @"cellWall";
 
     
 }
+
+
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -153,6 +158,9 @@ static NSString * const  wallIdentifier = @"cellWall";
     
     [self.navigationController setToolbarHidden:YES animated:YES];
 }
+
+#pragma mark - Delegate data to SidebarViewController VC
+
 
 
 #pragma mark - Check Status User
@@ -302,6 +310,7 @@ static NSString * const  wallIdentifier = @"cellWall";
                                                    NSLog(@" getWallFromServer newSize = %@",NSStringFromCGSize(newSize));
                                                    [weakSelf.imageViewSize addObject:[NSNumber numberWithFloat:roundf(newSize.height)]];
                                                    
+                                                   
                                                }
 
                                            
@@ -321,7 +330,7 @@ static NSString * const  wallIdentifier = @"cellWall";
 
 - (void)reloadTableViewContent {
     
-    if (self.loadingDataWall == NO && self.loadingDataOfUser == NO && self.loadingDataCollPhoto == NO) {
+    if (self.loadingDataOfUser == NO && self.loadingDataCollPhoto == NO) {
         
         dispatch_async(dispatch_get_main_queue(), ^ {
             
@@ -352,6 +361,7 @@ static NSString * const  wallIdentifier = @"cellWall";
     [defaults synchronize];
     
     [self getUserInfo];
+    [self reloadTableViewContent];
     
     
 }
@@ -556,7 +566,7 @@ static NSString * const  wallIdentifier = @"cellWall";
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     
-    return 3;
+    return 1;
     
 }
 
@@ -856,7 +866,6 @@ static NSString * const  wallIdentifier = @"cellWall";
     }
     
     if (section == 1) {
-        //return 1;
        return  [self.arrrayWall count];
     }
     
@@ -874,7 +883,13 @@ static NSString * const  wallIdentifier = @"cellWall";
                 
                 NGShortInfoTableViewCell *cell = (NGShortInfoTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"userInfoCell" forIndexPath:indexPath];
                 
-                [cell.avatarUser setImageWithURL:self.currentUser.photo_100URL placeholderImage:[UIImage imageNamed:@"pl_man"]];
+                NSString* photo = [NSString stringWithFormat:@"%@", self.currentUser.mainImageURL];
+                NSURL *imageURL;
+                if (photo) {
+                    imageURL = [NSURL URLWithString:photo];
+                }
+                
+                [cell.avatarUser setImageWithURL:imageURL placeholderImage:[UIImage imageNamed:@"pl_man"]];
                 
                 cell.nameUser.text = [NSString stringWithFormat:@"%@ %@",self.currentUser.firstName , self.currentUser.lastName];
                 cell.yearAndCityUser.text = self.currentUser.city;
@@ -906,13 +921,13 @@ static NSString * const  wallIdentifier = @"cellWall";
             if (indexPath.row == 2) {
                 
                 static NSString *MyIdentifier = @"countPhoto";
-                UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:MyIdentifier];
+                NGCountPhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:MyIdentifier];
                 if (cell == nil) {
-                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault  reuseIdentifier:MyIdentifier];
+                    cell = [[NGCountPhotoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault  reuseIdentifier:MyIdentifier];
                 }
                 
-                cell.textLabel.text = @"12";
-                return cell;
+                cell.labelCountPhoto.text = _currentUser.photos;
+            return cell;
             }
             if (indexPath.row == 3) {
                 NGPhotoProfileTableViewCell *cell = (NGPhotoProfileTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"NGPhotoProfileTableViewCell"];
@@ -926,182 +941,7 @@ static NSString * const  wallIdentifier = @"cellWall";
             }
 
         }
-        
-    if (indexPath.section == 1) {
-        
-        
-        NGWallCellTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:wallIdentifier];
-        
-        if (!cell) {
-            cell = [[NGWallCellTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wallIdentifier];
-            
-        }
-        
-        if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
-        if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
-        if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
-        
-        [cell layoutIfNeeded];
-        
-        NGGetWallObjectData* wall = self.arrrayWall[indexPath.row];
-        
-        if (wall.user) {
-            cell.fullName.text = [NSString stringWithFormat:@"%@ %@",wall.user.firstName, wall.user.lastName];
-            [cell.ownerPhoto setImageWithURL:wall.user.photo_100URL placeholderImage:[UIImage imageNamed:@"pl_man"]];
-        }
-        
-        
-        cell.textPost.text = wall.text;
-        cell.date.text     = wall.date;
-        
-        
-        cell.commentLabel.text = ([wall.comments length] > 3) ? ([NSString stringWithFormat:@"%@k",[wall.comments substringToIndex:1]]) : (wall.comments);
-        cell.likeLabel.text    = ([wall.likes length] > 3)    ? ([NSString stringWithFormat:@"%@k",[wall.likes substringToIndex:1]])    : (wall.likes);
-        cell.repostLabel.text  = ([wall.reposts length] > 3)  ? ([NSString stringWithFormat:@"%@k",[wall.reposts substringToIndex:1]])  : (wall.reposts);
-        
-        
-        
-        [cell.likeButton      addTarget:self action:@selector(addLikeOnPost2:) forControlEvents: UIControlEventTouchUpInside];
-        cell.likeButton.tag = indexPath.row;
-        
-        [cell.repostButton      addTarget:self action:@selector(addRepost:) forControlEvents:UIControlEventTouchUpInside];
-        cell.repostButton.tag = indexPath.row;
-        
-        
-        [cell.commentButton addTarget:self action:@selector(showComment:) forControlEvents:UIControlEventTouchUpInside];
-        cell.commentButton.tag = indexPath.row;
-        [cell.commentButton setImage:[UIImage imageNamed:@"comment"] forState:UIControlStateNormal];
-        
-        if (wall.canLike == NO) {
-            cell.likeView.backgroundColor =  [UIColor colorWithRed:0.333 green:0.584 blue:0.820 alpha:0.5];
-        }
-        
-        
-        if (wall.canRepost == NO) {
-            cell.repostView.backgroundColor =  [UIColor colorWithRed:0.333 green:0.584 blue:0.820 alpha:0.5];
-        } else {
-            cell.repostView.backgroundColor = [UIColor clearColor];
-        }
-        
-        
-        
-        
-        __weak NGWallCellTableViewCell *weakCell = cell;
-        
-        NSURL* url = [[NSURL alloc] init];
-        if (wall.user.photo_100URL) {
-            url = wall.user.photo_100URL;
-        }
-        
-//        NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
-//        
-//        [cell.ownerPhoto setImageWithURLRequest:request
-//                               placeholderImage:nil
-//                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
-//                                            
-//                                            weakCell.ownerPhoto.image = image;
-//                                            
-//                                        }
-//                                        failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
-//                                            
-//                                        }];
-//        
-//        
-//        
-        
-        if ([wall.attachments count] > 0) {
-            
-            if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
-            if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
-            if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
-            
-            CGPoint point = CGPointZero;
-            
-            float sizeText = [self heightLabelOfTextForString:cell.textPost.text fontSize:14.f widthLabel:CGRectGetWidth(self.view.bounds) - 2 * 8];
-            
-            point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame),sizeText+(offsetBeforePhoto + heightPhoto + offsetBetweenPhotoAndText));
-            
-            CGSize sizeAttachment = CGSizeMake(CGRectGetWidth(self.view.bounds)-2*offset, CGRectGetWidth(self.view.bounds)-2*offset);
-            
-            NGImageViewGallery *galery = [[NGImageViewGallery alloc]initWithImageArray:wall.attachments startPoint:point withSizeView:sizeAttachment];
-            galery.tag = 222;
-            [cell addSubview:galery];
-            
-            ///
-//            CGPoint newPoint = CGPointZero;
-//            
-//            for (id obj in wall.attachments) {
-//                
-//                if ([obj isKindOfClass:[NGLinkWallObjectData class]]) {
-//                    
-//                    if (CGRectGetMaxY(galery.frame)>70) {
-//                        point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(galery.frame));
-//                    } else {
-//                        point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(cell.textPost.frame));
-//                        
-//                    }
-//                    
-//                    
-//                    ASLink* link = (NGLinkWallObjectData*)obj;
-//                    
-//                    ASLinkModel* urlView = [[ASLinkModel alloc]initWithFrame:CGRectMake(point.x, point.y,
-//                                                                                        self.view.bounds.size.width-16,50)];
-//                    
-//                    urlView.bounds = CGRectMake(point.x, point.y,  self.view.bounds.size.width-16,50);
-//                    urlView.tag = 222;
-//                    urlView.titleLabel.text = link.title;
-//                    urlView.urlLabel.text   = link.urlString;
-//                    
-//                    [urlView.openSiteButton     addTarget:self
-//                                                   action:@selector(openSiteAction:)
-//                                         forControlEvents:UIControlEventTouchUpInside];
-//                    
-//                    [cell addSubview:urlView];
-//                    point.y += 60;
-//                    newPoint.y += 60;
-//                }
-//                
-//                
-//                if ([obj isKindOfClass:[ASAudio class]]) {
-//                    
-//                    if (newPoint.y>0) {
-//                        
-//                    } else {
-//                        
-//                        if (CGRectGetMaxY(galery.frame)>70) {
-//                            point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(galery.frame));
-//                        } else {
-//                            point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(cell.textPost.frame));
-//                        }
-//                    }
-//                    
-//                    ASAudio* audio = (ASAudio*)obj;
-//                    
-//                    ASAudioView* audioView = [[ASAudioView alloc]initWithFrame:CGRectMake(point.x, point.y,
-//                                                                                          self.view.bounds.size.width-16,50)];
-//                    
-//                    audioView.bounds = CGRectMake(point.x, point.y,  self.view.bounds.size.width-16,50);
-//                    audioView.tag = 555;
-//                    
-//                    audioView.titleLabel.text = audio.title;
-//                    audioView.descriptionLabel.text = audio.artist;
-//                    audioView.durationLabel.text  = audio.duration;
-//                    
-//                    
-//                    [cell addSubview:audioView];
-//                    point.y += 60;
-//                    newPoint.y += 60;
-            
-//                }
-//                
-//            }
-       }
-        return cell;
-        
     }
-        
-    }
-    
     static NSString *MyIdentifier = @"cellone";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:MyIdentifier];
     if (cell == nil) {
@@ -1113,8 +953,6 @@ static NSString * const  wallIdentifier = @"cellWall";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    //id cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
     if (indexPath.section == 0){
     if (indexPath.row == 0) {
         return 120.f;
@@ -1136,43 +974,8 @@ static NSString * const  wallIdentifier = @"cellWall";
             return 30;
         }
     }
-
     
-//    if ([cell isKindOfClass:[ASGrayCell class]]) {
-//        return 16.f;
-//    }
-//    
-//    if ([cell isKindOfClass:[ASSegmentPost class]]) {
-//        return 44.f;
-//    }
-//    
-//    if ([cell isKindOfClass:[ASWallAttachmentCell class]]) {
-//        
-//        
-//        
-//        ASWall* wall = self.arrrayWall[indexPath.row];
-//        
-//        
-//        float height = 0;
-//        
-//        if (![wall.text isEqualToString:@""]) {
-//            height = height + (int)[self heightLabelOfTextForString:wall.text fontSize:14.f widthLabel:self.view.frame.size.width-(offset*2)];
-//        }
-//        
-//        
-//        if ([wall.attachments count] > 0) {
-//            height = height + [[self.imageViewSize objectAtIndex:indexPath.row]floatValue];
-//        }
-//        
-//        NSLog(@"IndexPath.row = %ld section =%ld  size height = %f",(long)indexPath.row,(long)indexPath.section,(offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared));
-//        
-//        
-//        return (offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared);
-//        
-//    }
-    
-    
-    return 400.f;
+return 0.f;
 }
 
 
@@ -1218,5 +1021,219 @@ static NSString * const  wallIdentifier = @"cellWall";
 @end
 
 
+
+
+
+
+/*{
+ 
+ 
+                                    TABLE VIEW CELL
+ 
+ 
+ NGWallCellTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:wallIdentifier];
+ 
+ if (!cell) {
+ cell = [[NGWallCellTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wallIdentifier];
+ 
+ }
+ 
+ if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
+ if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
+ if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
+ 
+ [cell layoutIfNeeded];
+ 
+ NGGetWallObjectData* wall = self.arrrayWall[indexPath.row];
+ 
+ if (wall.user) {
+ cell.fullName.text = [NSString stringWithFormat:@"%@ %@",wall.user.firstName, wall.user.lastName];
+ [cell.ownerPhoto setImageWithURL:wall.user.photo_100URL placeholderImage:[UIImage imageNamed:@"pl_man"]];
+ }
+ 
+ 
+ cell.textPost.text = wall.text;
+ cell.date.text     = wall.date;
+ 
+ 
+ cell.commentLabel.text = ([wall.comments length] > 3) ? ([NSString stringWithFormat:@"%@k",[wall.comments substringToIndex:1]]) : (wall.comments);
+ cell.likeLabel.text    = ([wall.likes length] > 3)    ? ([NSString stringWithFormat:@"%@k",[wall.likes substringToIndex:1]])    : (wall.likes);
+ cell.repostLabel.text  = ([wall.reposts length] > 3)  ? ([NSString stringWithFormat:@"%@k",[wall.reposts substringToIndex:1]])  : (wall.reposts);
+ 
+ 
+ 
+ [cell.likeButton      addTarget:self action:@selector(addLikeOnPost2:) forControlEvents: UIControlEventTouchUpInside];
+ cell.likeButton.tag = indexPath.row;
+ 
+ [cell.repostButton      addTarget:self action:@selector(addRepost:) forControlEvents:UIControlEventTouchUpInside];
+ cell.repostButton.tag = indexPath.row;
+ 
+ 
+ [cell.commentButton addTarget:self action:@selector(showComment:) forControlEvents:UIControlEventTouchUpInside];
+ cell.commentButton.tag = indexPath.row;
+ [cell.commentButton setImage:[UIImage imageNamed:@"comment"] forState:UIControlStateNormal];
+ 
+ if (wall.canLike == NO) {
+ cell.likeView.backgroundColor =  [UIColor colorWithRed:0.333 green:0.584 blue:0.820 alpha:0.5];
+ }
+ 
+ 
+ if (wall.canRepost == NO) {
+ cell.repostView.backgroundColor =  [UIColor colorWithRed:0.333 green:0.584 blue:0.820 alpha:0.5];
+ } else {
+ cell.repostView.backgroundColor = [UIColor clearColor];
+ }
+ 
+ 
+ 
+ 
+ __weak NGWallCellTableViewCell *weakCell = cell;
+ 
+ NSURL* url = [[NSURL alloc] init];
+ if (wall.user.photo_100URL) {
+ url = wall.user.photo_100URL;
+ }
+ 
+         NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
+ 
+         [cell.ownerPhoto setImageWithURLRequest:request
+                                placeholderImage:nil
+                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+ 
+                                             weakCell.ownerPhoto.image = image;
+ 
+                                         }
+                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+ 
+                                         }];
+ 
+ 
+ 
+ 
+ if ([wall.attachments count] > 0) {
+ 
+ if ([cell viewWithTag: 11]) [[cell viewWithTag: 11] removeFromSuperview];
+ if ([cell viewWithTag:222]) [[cell viewWithTag:222] removeFromSuperview];
+ if ([cell viewWithTag:555]) [[cell viewWithTag:555] removeFromSuperview];
+ 
+ CGPoint point = CGPointZero;
+ 
+ float sizeText = [self heightLabelOfTextForString:cell.textPost.text fontSize:14.f widthLabel:CGRectGetWidth(self.view.bounds) - 2 * 8];
+ 
+ point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame),sizeText+(offsetBeforePhoto + heightPhoto + offsetBetweenPhotoAndText));
+ 
+ CGSize sizeAttachment = CGSizeMake(CGRectGetWidth(self.view.bounds)-2*offset, CGRectGetWidth(self.view.bounds)-2*offset);
+ 
+ NGImageViewGallery *galery = [[NGImageViewGallery alloc]initWithImageArray:wall.attachments startPoint:point withSizeView:sizeAttachment];
+ galery.tag = 222;
+ [cell addSubview:galery];
+ 
+ 
+             CGPoint newPoint = CGPointZero;
+ 
+             for (id obj in wall.attachments) {
+ 
+                 if ([obj isKindOfClass:[NGLinkWallObjectData class]]) {
+ 
+                     if (CGRectGetMaxY(galery.frame)>70) {
+                         point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(galery.frame));
+                     } else {
+                         point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(cell.textPost.frame));
+ 
+                     }
+ 
+ 
+                     ASLink* link = (NGLinkWallObjectData*)obj;
+ 
+                     ASLinkModel* urlView = [[ASLinkModel alloc]initWithFrame:CGRectMake(point.x, point.y,
+                                                                                         self.view.bounds.size.width-16,50)];
+ 
+                     urlView.bounds = CGRectMake(point.x, point.y,  self.view.bounds.size.width-16,50);
+                     urlView.tag = 222;
+                     urlView.titleLabel.text = link.title;
+                     urlView.urlLabel.text   = link.urlString;
+ 
+                     [urlView.openSiteButton     addTarget:self
+                                                    action:@selector(openSiteAction:)
+                                          forControlEvents:UIControlEventTouchUpInside];
+ 
+                     [cell addSubview:urlView];
+                     point.y += 60;
+                     newPoint.y += 60;
+                 }
+ 
+ 
+                 if ([obj isKindOfClass:[ASAudio class]]) {
+ 
+                     if (newPoint.y>0) {
+ 
+                     } else {
+ 
+                         if (CGRectGetMaxY(galery.frame)>70) {
+                             point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(galery.frame));
+                         } else {
+                             point = CGPointMake(CGRectGetMinX(cell.ownerPhoto.frame), CGRectGetMaxY(cell.textPost.frame));
+                         }
+                     }
+ 
+                     ASAudio* audio = (ASAudio*)obj;
+ 
+                     ASAudioView* audioView = [[ASAudioView alloc]initWithFrame:CGRectMake(point.x, point.y,
+                                                                                           self.view.bounds.size.width-16,50)];
+ 
+                     audioView.bounds = CGRectMake(point.x, point.y,  self.view.bounds.size.width-16,50);
+                     audioView.tag = 555;
+ 
+                     audioView.titleLabel.text = audio.title;
+                     audioView.descriptionLabel.text = audio.artist;
+                     audioView.durationLabel.text  = audio.duration;
+ 
+ 
+                     [cell addSubview:audioView];
+                     point.y += 60;
+                     newPoint.y += 60;
+ 
+                 }
+ 
+             }
+ }
+ return cell;
+ 
+ 
+ 
+ //    if ([cell isKindOfClass:[ASGrayCell class]]) {
+ //        return 16.f;
+ //    }
+ //
+ //    if ([cell isKindOfClass:[ASSegmentPost class]]) {
+ //        return 44.f;
+ //    }
+ //
+ //    if ([cell isKindOfClass:[ASWallAttachmentCell class]]) {
+ //
+ //
+ //
+ //        ASWall* wall = self.arrrayWall[indexPath.row];
+ //
+ //
+ //        float height = 0;
+ //
+ //        if (![wall.text isEqualToString:@""]) {
+ //            height = height + (int)[self heightLabelOfTextForString:wall.text fontSize:14.f widthLabel:self.view.frame.size.width-(offset*2)];
+ //        }
+ //
+ //
+ //        if ([wall.attachments count] > 0) {
+ //            height = height + [[self.imageViewSize objectAtIndex:indexPath.row]floatValue];
+ //        }
+ //
+ //        NSLog(@"IndexPath.row = %ld section =%ld  size height = %f",(long)indexPath.row,(long)indexPath.section,(offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared));
+ //
+ //
+ //        return (offsetBeforePhoto + heightPhoto) + (offsetBetweenPhotoAndText + height) + (offsetBetweenTextAndShared + heightShared + offsetAfterShared);
+ //        
+ //    }
+ 
+ }*/
 
 

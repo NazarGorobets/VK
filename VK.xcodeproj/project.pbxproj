@@ -14,6 +14,8 @@
 		6920AE221BDE6790005CBFEB /* NGPhotoUserCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6920AE211BDE6790005CBFEB /* NGPhotoUserCollectionViewController.m */; settings = {ASSET_TAGS = (); }; };
 		6920AE261BDE6B7F005CBFEB /* NGPhotoListCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6920AE251BDE6B7F005CBFEB /* NGPhotoListCollectionViewCell.m */; settings = {ASSET_TAGS = (); }; };
 		69242E481BE0CA13000925BF /* NGShortInfoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69242E471BE0CA13000925BF /* NGShortInfoTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
+		695F9E5F1BE20D150028AFE0 /* NGCountPhotoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 695F9E5E1BE20D150028AFE0 /* NGCountPhotoTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
+		695F9E611BE213340028AFE0 /* iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 695F9E601BE213340028AFE0 /* iPad.storyboard */; settings = {ASSET_TAGS = (); }; };
 		696BF6151BD872D100468091 /* NGMoreInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 696BF6141BD872D100468091 /* NGMoreInfoViewController.m */; settings = {ASSET_TAGS = (); }; };
 		6988FA161BD91AD1009E6BF8 /* NGFirstCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6988FA151BD91AD1009E6BF8 /* NGFirstCollectionViewCell.m */; settings = {ASSET_TAGS = (); }; };
 		6988FA1A1BD923AB009E6BF8 /* NGUserSubscriberCountTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6988FA191BD923AB009E6BF8 /* NGUserSubscriberCountTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
@@ -83,6 +85,9 @@
 		6920AE251BDE6B7F005CBFEB /* NGPhotoListCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGPhotoListCollectionViewCell.m; sourceTree = "<group>"; };
 		69242E461BE0CA13000925BF /* NGShortInfoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGShortInfoTableViewCell.h; sourceTree = "<group>"; };
 		69242E471BE0CA13000925BF /* NGShortInfoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGShortInfoTableViewCell.m; sourceTree = "<group>"; };
+		695F9E5D1BE20D150028AFE0 /* NGCountPhotoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGCountPhotoTableViewCell.h; sourceTree = "<group>"; };
+		695F9E5E1BE20D150028AFE0 /* NGCountPhotoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGCountPhotoTableViewCell.m; sourceTree = "<group>"; };
+		695F9E601BE213340028AFE0 /* iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = iPad.storyboard; sourceTree = "<group>"; };
 		696BF6131BD872D100468091 /* NGMoreInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGMoreInfoViewController.h; sourceTree = "<group>"; };
 		696BF6141BD872D100468091 /* NGMoreInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGMoreInfoViewController.m; sourceTree = "<group>"; };
 		6988FA141BD91AD1009E6BF8 /* NGFirstCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGFirstCollectionViewCell.h; sourceTree = "<group>"; };
@@ -223,6 +228,8 @@
 				699B9E631BDF9FC2002ADB8A /* NGWallCellTableViewCell.m */,
 				69242E461BE0CA13000925BF /* NGShortInfoTableViewCell.h */,
 				69242E471BE0CA13000925BF /* NGShortInfoTableViewCell.m */,
+				695F9E5D1BE20D150028AFE0 /* NGCountPhotoTableViewCell.h */,
+				695F9E5E1BE20D150028AFE0 /* NGCountPhotoTableViewCell.m */,
 			);
 			name = "Custom Cell Table View";
 			sourceTree = "<group>";
@@ -419,6 +426,7 @@
 			isa = PBXGroup;
 			children = (
 				69F9661E1BD5841500A4205A /* IPhone.storyboard */,
+				695F9E601BE213340028AFE0 /* iPad.storyboard */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -556,6 +564,7 @@
 				699B9E7F1BDFA61C002ADB8A /* Done@2x.png in Resources */,
 				69F966221BD5841500A4205A /* Assets.xcassets in Resources */,
 				699B9E7E1BDFA61C002ADB8A /* Done.png in Resources */,
+				695F9E611BE213340028AFE0 /* iPad.storyboard in Resources */,
 				69F966201BD5841500A4205A /* IPhone.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -634,6 +643,7 @@
 				69C78BF61BD7C69A0003371E /* NGGetFriendsObjectData.m in Sources */,
 				69FF948D1BD59FBC00A1FFD5 /* SidebarViewController.m in Sources */,
 				69B6ADB71BDEAB43008122C1 /* NGLinkWallObjectData.m in Sources */,
+				695F9E5F1BE20D150028AFE0 /* NGCountPhotoTableViewCell.m in Sources */,
 				6988FA1A1BD923AB009E6BF8 /* NGUserSubscriberCountTableViewCell.m in Sources */,
 				69C78C0C1BD7D2E40003371E /* NGLinkObjectData.m in Sources */,
 				69FF94A41BD6324300A1FFD5 /* NGServerManager.m in Sources */,

@@ -50,7 +50,6 @@ static NSString * const reuseIdentifier = @"Cell";
      self.userID = [userDefaults objectForKey:@"userID"];
      self.miniaturePhotoArray     = [NSMutableArray array];
     [self getUserPhotoFromServer];
-    //[self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
     
     SWRevealViewController *revealViewController = self.revealViewController;
     if ( revealViewController )
@@ -63,6 +62,11 @@ static NSString * const reuseIdentifier = @"Cell";
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController setToolbarHidden:NO animated:NO];
 }
 
 -(void)  getUserPhotoFromServer {
